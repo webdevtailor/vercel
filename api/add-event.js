@@ -1,38 +1,39 @@
 import { google } from 'googleapis';
 
 export default async function handler(req, res) {
-  // 1. Only allow the "Save" button to talk to this file
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
+    return res.status(405).send({ message: 'Only POST requests allowed' });
   }
 
+  const { eventName } = req.body;
+
+  // This part is the "Fireproof" cleaner
+  const rawKey = process.env.GOOGLE_PRIVATE_KEY || "";
+  const privateKey = rawKey.replace(/\\n/g, '\n'); 
+
+  const auth = new google.auth.GoogleAuth({
+    credentials: {
+      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      private_key: privateKey,
+    },
+    scopes: ['https://www.googleapis.com/auth/calendar.events'],
+  });
+
+  const calendar = google.calendar({ version: 'v3', auth });
+  const calendarId = 'primary'; 
+
   try {
-    const { title, start, end } = req.body;
-    
-    // 2. Log in using your CnJ M1 credentials (we will set these in Vercel later)
-    const auth = new google.auth.JWT(
-      process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      null,
-      process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      ['https://www.googleapis.com/auth/calendar.events']
-    );
-
-    const calendar = google.calendar({ version: 'v3', auth });
-
-    // 3. Send the event directly to Aşklarım
     await calendar.events.insert({
-      calendarId: 'm4arsogahrubaolgt28k86grtk@group.calendar.google.com', 
+      calendarId: calendarId,
       requestBody: {
-        summary: title,
-        start: { dateTime: start, timeZone: 'Europe/Istanbul' },
-        end: { dateTime: end, timeZone: 'Europe/Istanbul' },
+        summary: eventName,
+        start: { dateTime: new Date().toISOString() },
+        end: { dateTime: new Date(Date.now() + 3600000).toISOString() },
       },
     });
-
-    // 4. Tell the website it worked!
-    return res.status(200).json({ success: true });
+    res.status(200).send({ message: 'Success! Event added to Aşklarım' });
   } catch (error) {
-    // If something breaks, tell us exactly what
-    return res.status(500).json({ error: error.message });
+    console.error('Google Calendar Error:', error);
+    res.status(500).send({ message: 'Error: ' + error.message });
   }
 }
