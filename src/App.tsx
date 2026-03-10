@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 
-function App() {
-  const [title, setTitle] = useState('');
-  const [date, setDate] = useState(''); 
-  const [time, setTime] = useState(''); 
-  const [status, setStatus] = useState('');
+export default function App() {
+  const [title, setTitle] = useState<string>('');
+  const [date, setDate] = useState<string>(''); 
+  const [time, setTime] = useState<string>(''); 
+  const [status, setStatus] = useState<string>('');
 
   const handleSave = async () => {
     if (!title || !date || !time) {
@@ -24,7 +24,7 @@ function App() {
         setTitle(''); setDate(''); setTime('');
       } else {
         const err = await response.json();
-        setStatus('Hata: ' + err.error);
+        setStatus('Hata: ' + (err.error || 'Bilinmeyen hata'));
       }
     } catch (e) {
       setStatus('Sunucuya bağlanılamadı.');
@@ -38,13 +38,29 @@ function App() {
         <input 
           placeholder="Etkinlik Başlığı" 
           value={title} 
-          onChange={(e) => setTitle(e.target.value)} 
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)} 
           style={{ padding: '10px' }}
         />
-        {/* HERE ARE YOUR DATE AND TIME BUTTONS */}
         <input 
           type="date" 
           value={date} 
-          onChange={(e) => setDate(e.target.value)} 
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setDate(e.target.value)} 
           style={{ padding: '10px' }}
         />
+        <input 
+          type="time" 
+          value={time} 
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setTime(e.target.value)} 
+          style={{ padding: '10px' }}
+        />
+        <button 
+          onClick={handleSave} 
+          style={{ padding: '15px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+        >
+          KAYDET
+        </button>
+      </div>
+      <p><strong>Durum:</strong> {status}</p>
+    </div>
+  );
+}
