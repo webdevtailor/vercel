@@ -2,72 +2,49 @@ import React, { useState } from 'react';
 
 function App() {
   const [title, setTitle] = useState('');
-  const [date, setDate] = useState(''); // New state for Date
-  const [time, setTime] = useState(''); // New state for Time
+  const [date, setDate] = useState(''); 
+  const [time, setTime] = useState(''); 
   const [status, setStatus] = useState('');
 
   const handleSave = async () => {
     if (!title || !date || !time) {
-      setStatus('Lütfen tüm alanları doldurun (Title, Date, Time).');
+      setStatus('Hata: Lütfen Başlık, Tarih ve Saat seçin!');
       return;
     }
-
-    setStatus('Saving...');
+    setStatus('Kaydediliyor...');
     try {
-      // Combine date and time into a single timestamp
-      const startDateTime = new Date(`${date}T${time}:00`);
-      
       const response = await fetch('/api/add-event', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          date, // Sending the specific date
-          time, // Sending the specific time
-        }),
+        body: JSON.stringify({ title, date, time }),
       });
 
       if (response.ok) {
-        setStatus('Success! Event added to Aşklarım.');
-        setTitle('');
-        setDate('');
-        setTime('');
+        setStatus('Başarılı! Takvime eklendi.');
+        setTitle(''); setDate(''); setTime('');
       } else {
         const err = await response.json();
-        setStatus('Error: ' + err.error);
+        setStatus('Hata: ' + err.error);
       }
     } catch (e) {
-      setStatus('Failed to connect to server.');
+      setStatus('Sunucuya bağlanılamadı.');
     }
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+    <div style={{ padding: '40px', fontFamily: 'sans-serif', maxWidth: '500px' }}>
       <h1>Kiya Calendar</h1>
-      <div style={{ marginBottom: '10px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         <input 
+          placeholder="Etkinlik Başlığı" 
           value={title} 
           onChange={(e) => setTitle(e.target.value)} 
-          placeholder="Event title" 
-          style={{ padding: '10px', marginRight: '10px' }}
+          style={{ padding: '10px' }}
         />
+        {/* HERE ARE YOUR DATE AND TIME BUTTONS */}
         <input 
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          style={{ padding: '10px', marginRight: '10px' }}
+          type="date" 
+          value={date} 
+          onChange={(e) => setDate(e.target.value)} 
+          style={{ padding: '10px' }}
         />
-        <input 
-          type="time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          style={{ padding: '10px', marginRight: '10px' }}
-        />
-        <button onClick={handleSave} style={{ padding: '10px 20px', cursor: 'pointer' }}>Kaydet</button>
-      </div>
-      <p><strong>Status:</strong> {status}</p>
-    </div>
-  );
-}
-
-export default App;
