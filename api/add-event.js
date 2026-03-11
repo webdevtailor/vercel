@@ -14,9 +14,17 @@ export default async function handler(req, res) {
 
   const calendar = google.calendar({ version: 'v3', auth });
 
-  // Create the date object
-  const startDateTime = new Date(`${date}T${time}:00`);
-  const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000);
+  // 1. Create the start string with the Istanbul +03:00 offset included
+  // Format: YYYY-MM-DDTHH:mm:ss+03:00
+  const startString = `${date}T${time}:00+03:00`;
+
+  // 2. Calculate the end time (1 hour later)
+  const startDateObj = new Date(`${date}T${time}:00Z`); // Use Z just for calculation
+  const endDateObj = new Date(startDateObj.getTime() + 60 * 60 * 1000);
+  
+  const endHours = String(endDateObj.getUTCHours()).padStart(2, '0');
+  const endMinutes = String(endDateObj.getUTCMinutes()).padStart(2, '0');
+  const endString = `${date}T${endHours}:${endMinutes}:00+03:00`;
 
   try {
     await calendar.events.insert({
@@ -24,13 +32,11 @@ export default async function handler(req, res) {
       resource: {
         summary: title || 'Yeni Etkinlik',
         start: {
-          // REMOVED .toISOString() - This keeps your local time numbers!
-          dateTime: `${date}T${time}:00`, 
+          dateTime: startString,
           timeZone: 'Europe/Istanbul',
         },
         end: {
-          // Manual calculation for the end time string
-          dateTime: new Date(endDateTime.getTime() - (endDateTime.getTimezoneOffset() * 60000)).toISOString().split('.')[0].slice(0, -3),
+          dateTime: endString,
           timeZone: 'Europe/Istanbul',
         },
       },
