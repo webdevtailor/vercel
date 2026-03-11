@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
   try {
     await calendar.events.insert({
-      calendarId: 'm4arsogahrubaolgt28k86grtk@group.calendar.google.com',
+      calendarId: 'webdevtailor@gmail.com',
       resource: {
         summary: title || 'Yeni Etkinlik',
         start: {
