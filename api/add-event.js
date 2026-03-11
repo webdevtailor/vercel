@@ -3,7 +3,6 @@ import { google } from 'googleapis';
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-  // This part connects to the new buttons you just added
   const { title, date, time } = req.body;
 
   const auth = new google.auth.JWT(
@@ -15,9 +14,9 @@ export default async function handler(req, res) {
 
   const calendar = google.calendar({ version: 'v3', auth });
 
-  // This combines your date and time into a format Google understands
+  // Create the date object
   const startDateTime = new Date(`${date}T${time}:00`);
-  const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000); // 1 hour duration
+  const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000);
 
   try {
     await calendar.events.insert({
@@ -25,11 +24,13 @@ export default async function handler(req, res) {
       resource: {
         summary: title || 'Yeni Etkinlik',
         start: {
-          dateTime: startDateTime.toISOString(),
+          // REMOVED .toISOString() - This keeps your local time numbers!
+          dateTime: `${date}T${time}:00`, 
           timeZone: 'Europe/Istanbul',
         },
         end: {
-          dateTime: endDateTime.toISOString(),
+          // Manual calculation for the end time string
+          dateTime: new Date(endDateTime.getTime() - (endDateTime.getTimezoneOffset() * 60000)).toISOString().split('.')[0].slice(0, -3),
           timeZone: 'Europe/Istanbul',
         },
       },
