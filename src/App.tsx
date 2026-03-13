@@ -10,7 +10,7 @@ const App = () => {
 
   const calendarMap: any = {
     'Ben': 'webdevtailor@gmail.com',
-    'Aşklarım': 'eee8507f922f61f8b9fd1bb92b93669d2f7137c1194c3e39202b3769c2209271@group.calendar.google.com',
+    'Etkinliklerim': 'eee8507f922f61f8b9fd1bb92b93669d2f7137c1194c3e39202b3769c2209271@group.calendar.google.com',
     'B/S/H/': 'f4e89acaf3fe49c3eded76e97a41794d4046c4eb5d05390012fdced6fc7de77b@group.calendar.google.com',
     'Kişisel Gelişimim': '1ab4ca4860a2cce0e42525fb6b90f9f150a848706ca7f235ee21a4e05645645c@group.calendar.google.com',
     'Sağlığım': '70085d6768fba04f3eab51577dc2a2687105b76b1d4a6ecfde3160231d2c3366@group.calendar.google.com'
